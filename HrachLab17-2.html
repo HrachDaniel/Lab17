@@ -138,7 +138,7 @@ makeGuess();
                 
                 // Перевіряємо, чи введено число
                 const num = parseInt(guess);
-                if (isNaN(num)  num < 0  num > 100) {
+                if (isNaN(num) || num < 0 || num > 100) {
                     alert('Будь ласка, введіть число від 0 до 100!');
                     makeGuess();
                     return;
