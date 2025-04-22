@@ -3,150 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Гра "Вгадай число"</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            text-align: center;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        #log {
-            margin-top: 20px;
-            text-align: left;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            max-height: 300px;
-            overflow-y: auto;
-            background-color: #f9f9f9;
-        }
-    </style>
+    <title>Поточний час</title>
 </head>
 <body>
-    <h1>Гра "Вгадай число"</h1>
-    <p>Спробуйте вгадати число від 0 до 100</p>
-    <button id="startButton">Почати гру</button>
-    <div id="log"></div>
+    <h1>Поточний час:</h1>
+    <div id="current-time"></div>
 
     <script>
-        let targetNumber;
-        let attempts;
-        let previousDifference;
-        let gameActive = false;
+        function показатиПоточнийЧас() {
+            const зараз = new Date();
+            const години = зараз.getHours().toString().padStart(2, '0');
+            const хвилини = зараз.getMinutes().toString().padStart(2, '0');
+            const секунди = зараз.getSeconds().toString().padStart(2, '0');
+            const деньТижня = new Intl.DateTimeFormat('uk-UA', { weekday: 'long' }).format(зараз);
+            const день = зараз.getDate().toString().padStart(2, '0');
+            const місяць = new Intl.DateTimeFormat('uk-UA', { month: 'long' }).format(зараз);
+            const рік = зараз.getFullYear();
 
-        const startButton = document.getElementById('startButton');
-        startButton.addEventListener('click', startGame);
-
-        function startGame() {
-            if (gameActive) return;
-            
-            targetNumber = Math.floor(Math.random() * 101);
-            attempts = 0;
-            previousDifference = null;
-            gameActive = true;
-            document.getElementById('log').innerHTML = '';
-            
-            logToConsole(Початок гри. Загадане число: ${targetNumber} (тільки для тесту));
-            makeGuess();
+            const відформатованийЧас = ${години}:${хвилини}:${секунди}, ${деньТижня}, ${день} ${місяць} ${рік} року;
+            document.getElementById('current-time').textContent = відформатованийЧас;
         }
 
-        function makeGuess() {
-            if (!gameActive) return;
+        // Оновлювати час кожну секунду
+        setInterval(показатиПоточнийЧас, 1000);
 
-            const guess = prompt(Спроба ${attempts + 1}. Введіть число від 0 до 100:);
-            
-            // Якщо користувач натиснув "Скасувати"
-            if (guess === null) {
-                gameActive = false;
-                logToConsole('Гру перервано');
-                return;
-            }
-
-            const number = parseInt(guess);
-            
-            // Перевірка на коректність введення
-            if (isNaN(number) || number < 0 || number > 100) {
-                alert('Будь ласка, введіть коректне число від 0 до 100!');
-                makeGuess();
-                return;
-            }
-
-            attempts++;
-            logAttempt(number);
-
-            if (number === targetNumber) {
-                const message = Вітаємо! За ${attempts} спроб ви вгадали число ${targetNumber}.;
-                alert(message);
-                logToConsole(message);
-                
-                if (confirm('Бажаєте зіграти ще раз?')) {
-                    startGame();
-                } else {
-                    gameActive = false;
-                }
-            } else {
-                const difference = Math.abs(targetNumber - number);
-                let hint = getHint(difference, previousDifference);
-                previousDifference = difference;
-                
-                alert(Не вгадали! ${hint}\nВаше число ${number < targetNumber ? 'менше' : 'більше'} за загадане.);
-                makeGuess();
-            }
-        }
-
-        function getHint(currentDiff, prevDiff) {
-            if (prevDiff === null) {
-                if (currentDiff > 50) return "Дуже холодно! ❄️";
-                if (currentDiff > 30) return "Холодно 🥶";
-                if (currentDiff > 15) return "Тепло 🌤";
-                return "Гаряче! 🔥";
-            } else {
-                if (currentDiff > prevDiff) {
-                    if (currentDiff > 50) return "Дуже холодно (холодніше)! ❄️❄️";
-if (currentDiff > 30) return "Холодніше 🥶";
-                    return "Тепліше, але все ще холодно 🌤";
-                } else {
-                    if (currentDiff < 10) return "Дуже гаряче (тепліше)! 🔥🔥";
-                    if (currentDiff < 20) return "Гаряче (тепліше)! 🔥";
-                    return "Тепліше 🌤";
-                }
-            }
-        }
-
-        function logAttempt(number) {
-            const now = new Date();
-            const dateStr = String(now.getDate()).padStart(2, '0') + '.' + 
-                           String(now.getMonth() + 1).padStart(2, '0') + '.' + 
-                           now.getFullYear();
-            const timeStr = String(now.getHours()).padStart(2, '0') + ':' + 
-                           String(now.getMinutes()).padStart(2, '0') + ':' + 
-                           String(now.getSeconds()).padStart(2, '0');
-            const logMessage = ${dateStr} ${timeStr} Спроба ${attempts}: число ${number} - не вірно;
-            
-            console.log(logMessage);
-            logToConsole(logMessage);
-        }
-
-        function logToConsole(message) {
-            const logElement = document.getElementById('log');
-            logElement.innerHTML += message + '<br>';
-            logElement.scrollTop = logElement.scrollHeight;
-        }
+        // Показати час одразу після завантаження сторінки
+        показатиПоточнийЧас();
     </script>
 </body>
-</html>
+</html
