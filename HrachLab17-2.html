@@ -1,1 +1,170 @@
-123
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Гра "Вгадай число"</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #attempts {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        #log {
+            margin-top: 20px;
+            text-align: left;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Гра "Вгадай число"</h1>
+        <p>Спробуйте вгадати число від 0 до 100, яке загадала програма.</p>
+        <p>Після кожної спроби ви отримаєте підказку: "холодно", "гаряче" тощо.</p>
+        <button id="startGame">Почати гру</button>
+        <div id="attempts"></div>
+        <div id="log"></div>
+    </div>
+
+    <script>
+        document.getElementById('startGame').addEventListener('click', function() {
+            startNewGame();
+        });
+
+        function startNewGame() {
+            // Генеруємо випадкове число від 0 до 100
+            const secretNumber = Math.floor(Math.random() * 101);
+            let previousDifference = null;
+            let attempts = 0;
+            
+            // Очищаємо лог
+            document.getElementById('log').innerHTML = '';
+            
+            alert("Вітаю у грі 'Вгадай число'! Спробуйте вгадати число від 0 до 100.");
+            
+            function playGame() {
+                attempts++;
+                const userGuess = prompt(Спроба ${attempts}. Введіть ваше число:);
+                
+                // Отримуємо поточну дату та час для логування
+                const now = new Date();
+                const timestamp = ${now.getDate().toString().padStart(2, '0')}.${(now.getMonth()+1).toString().padStart(2, '0')}.${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')};
+                
+                // Перевіряємо, чи користувач натиснув "Скасувати"
+                if (userGuess === null) {
+                    const logMessage = ${timestamp} Гра перервана. Число було: ${secretNumber};
+                    console.log(logMessage);
+                    document.getElementById('log').innerHTML += <p>${logMessage}</p>;
+                    alert("Гру завершено. До побачення!");
+                    document.getElementById('attempts').textContent = Гру перервано. Число було: ${secretNumber};
+                    return;
+                }
+                
+                // Перевіряємо, чи введено число
+                const guess = parseInt(userGuess);
+                if (isNaN(guess)) {
+                    alert("Будь ласка, введіть число!");
+                    playGame();
+                    return;
+                }
+                
+                // Перевіряємо, чи число в діапазоні
+                if (guess < 0 || guess > 100) {
+alert("Будь ласка, введіть число від 0 до 100!");
+                    playGame();
+                    return;
+                }
+                
+                // Логуємо спробу
+                const logMessage = ${timestamp} Спроба ${attempts}: число ${guess} – не вірно;
+                console.log(logMessage);
+                document.getElementById('log').innerHTML += <p>${logMessage}</p>;
+                
+                // Перевіряємо, чи вгадали
+                if (guess === secretNumber) {
+                    const successMessage = За ${attempts} спроб ви вгадали число ${secretNumber};
+                    alert(successMessage);
+                    document.getElementById('attempts').textContent = successMessage;
+                    
+                    // Логуємо успішну спробу
+                    const successLog = ${timestamp} Спроба ${attempts}: число ${guess} – вірно!;
+                    console.log(successLog);
+                    document.getElementById('log').innerHTML += <p><strong>${successLog}</strong></p>;
+                    
+                    // Запитуємо, чи хоче гравець зіграти ще раз
+                    const playAgain = confirm("Бажаєте зіграти ще раз?");
+                    if (playAgain) {
+                        startNewGame();
+                    }
+                    return;
+                }
+                
+                // Обчислюємо різницю
+                const difference = Math.abs(secretNumber - guess);
+                
+                // Визначаємо підказку
+                let hint;
+                if (difference >= 50) {
+                    hint = "Дуже холодно!";
+                } else if (difference >= 30) {
+                    hint = "Холодно!";
+                } else if (difference >= 15) {
+                    hint = "Тепло!";
+                } else {
+                    hint = "Гаряче!";
+                }
+                
+                // Додаємо підказку про напрямок, якщо це не перша спроба
+                if (previousDifference !== null) {
+                    if (difference < previousDifference) {
+                        hint += " Тепліше!";
+                    } else if (difference > previousDifference) {
+                        hint += " Холодніше!";
+                    }
+                }
+                
+                previousDifference = difference;
+                alert(${hint} Спробуйте ще раз.);
+                document.getElementById('attempts').textContent = Спроба ${attempts}: ${hint};
+                playGame();
+            }
+            
+            playGame();
+        }
+    </script>
+</body>
+</html>
