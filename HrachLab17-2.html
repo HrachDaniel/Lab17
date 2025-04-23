@@ -2,223 +2,133 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Гра "Вгадай число"</title>
+    <title>Вгадай число</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
             margin: 0;
-            padding: 20px;
-            background-color: #f0f0f0;
+            background-color: #f4f4f4;
         }
-        
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
         h1 {
-            color: #2c3e50;
+            color: #333;
+            margin-bottom: 20px;
         }
-        
-        .game-container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        
-        .btn {
+        button {
             padding: 10px 20px;
-            font-size: 16px;
-            background-color: #3498db;
-            color: white;
+            font-size: 1em;
+            background-color: #007bff;
+            color: #fff;
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #console-output {
             margin-top: 20px;
-        }
-        
-        .btn:hover {
-            background-color: #2980b9;
-        }
-        
-        .message {
-            margin: 20px 0;
             padding: 10px;
+            border: 1px solid #ccc;
             border-radius: 5px;
-            font-weight: bold;
-        }
-        
-        .cold {
-            background-color: #3498db;
-            color: white;
-        }
-        
-        .hot {
-            background-color: #e74c3c;
-            color: white;
-        }
-        
-        .very-cold {
-            background-color: #2980b9;
-            color: white;
-        }
-        
-        .very-hot {
-            background-color: #c0392b;
-            color: white;
-        }
-        
-        .history {
-            margin-top: 20px;
+            background-color: #eee;
+            font-family: monospace;
+            white-space: pre-wrap;
             text-align: left;
-        }
-        
-        .history-item {
-            padding: 5px;
-            border-bottom: 1px solid #eee;
         }
     </style>
 </head>
 <body>
-    <div class="game-container">
+    <div class="container">
         <h1>Гра "Вгадай число"</h1>
-        <p>Спробуйте вгадати число від 0 до 100!</p>
-        <button id="start-btn" class="btn">Почати гру</button>
-        
-        <div id="game-area" style="display: none;">
-            <div id="message" class="message"></div>
-            <div class="history" id="history"></div>
-        </div>
+        <button onclick="startGame()">Розпочати гру</button>
+        <div id="console-output"></div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const startBtn = document.getElementById('start-btn');
-            const gameArea = document.getElementById('game-area');
-            const messageDiv = document.getElementById('message');
-            const historyDiv = document.getElementById('history');
-            
-            let targetNumber;
-            let previousGuess;
-            let attempts;
-            
-            startBtn.addEventListener('click', startGame);
-            
-            function startGame() {
-                // Генеруємо випадкове число від 0 до 100
-                targetNumber = Math.floor(Math.random() * 101);
-                previousGuess = null;
-                attempts = 0;
-                
-                // Показуємо ігрову область
-                gameArea.style.display = 'block';
-                startBtn.style.display = 'none';
-                
-                // Очищаємо історію
-                historyDiv.innerHTML = '';
-                
-                // Починаємо гру
-                makeGuess();
+        let secretNumber;
+        let attempts;
+        const consoleOutput = document.getElementById('console-output');
+
+        function logAttempt(guess, isCorrect) {
+            const now = new Date();
+            const formattedDate = `${String(now.getDate()).padStart(2, '0')}.${String(now.getMonth() + 1).padStart(2, '0')}.${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+            const resultText = isCorrect ? '– вгадано' : '– не вірно';
+            console.log(`${formattedDate} Спроба ${attempts}: Число ${guess} ${resultText}`);
+            consoleOutput.textContent += `${formattedDate} Спроба ${attempts}: Число ${guess} ${resultText}\n`;
+        }
+
+        function getClue(guess) {
+            const difference = Math.abs(secretNumber - guess);
+            if (difference === 0) {
+                return ""; // Вгадано
+            } else if (difference <= 5) {
+                return "дуже гаряче";
+            } else if (difference <= 10) {
+                return "гаряче";
+            } else if (difference <= 20) {
+                return "тепло";
+            } else if (difference <= 30) {
+                return "холодно";
+            } else {
+                return "дуже холодно";
             }
-            
-            function makeGuess() {
-                const guess = prompt(Спроба ${attempts + 1}. Введіть число від 0 до 100:);
-                
-                // Перевіряємо, чи користувач натиснув "Скасувати"
-                if (guess === null) {
-                    const confirmExit = confirm('Ви впевнені, що хочете завершити гру?');
-                    if (confirmExit) {
-                        endGame();
-                        return;
-                    } else {
-makeGuess();
-                        return;
-                    }
-                }
-                
-                // Перевіряємо, чи введено число
-                const num = parseInt(guess);
-                if (isNaN(num) || num < 0 || num > 100) {
-                    alert('Будь ласка, введіть число від 0 до 100!');
-                    makeGuess();
-                    return;
-                }
-                
-                attempts++;
-                
-                // Перевіряємо, чи вгадали
-                if (num === targetNumber) {
-                    showMessage(Вітаємо! Ви вгадали число ${targetNumber} за ${attempts} спроб!, '');
-                    addToHistory(num, 'Вгадали!');
-                    endGame();
-                    return;
-                }
-                
-                // Визначаємо відхилення
-                const difference = Math.abs(num - targetNumber);
-                let feedback = '';
-                let messageClass = '';
-                
-                if (difference >= 50) {
-                    feedback = 'Дуже холодно';
-                    messageClass = 'very-cold';
-                } else if (difference >= 30) {
-                    feedback = 'Холодно';
-                    messageClass = 'cold';
-                } else if (difference >= 15) {
-                    feedback = 'Тепло';
-                    messageClass = 'hot';
-                } else if (difference >= 5) {
-                    feedback = 'Гаряче';
-                    messageClass = 'hot';
-                } else {
-                    feedback = 'Дуже гаряче!';
-                    messageClass = 'very-hot';
-                }
-                
-                // Додаємо інформацію про напрямок
-                if (previousGuess !== null) {
-                    const prevDiff = Math.abs(previousGuess - targetNumber);
-                    if (difference < prevDiff) {
-                        feedback += ', тепліше!';
-                    } else if (difference > prevDiff) {
-                        feedback += ', холодніше!';
-                    } else {
-                        feedback += ', таке саме відхилення';
-                    }
-                }
-                
-                showMessage(feedback, messageClass);
-                addToHistory(num, feedback);
-                previousGuess = num;
-                
-                // Продовжуємо гру
-                makeGuess();
+        }
+
+        function playGame() {
+            const guessStr = prompt(`Спроба ${attempts + 1}: Введіть число від 0 до 100:`);
+
+            if (guessStr === null) {
+                alert("Гру скасовано.");
+                return false;
             }
-            
-            function showMessage(text, className) {
-                messageDiv.textContent = text;
-                messageDiv.className = 'message ' + className;
+
+            const guess = parseInt(guessStr);
+
+            if (isNaN(guess) || guess < 0 || guess > 100) {
+                alert("Будь ласка, введіть коректне число від 0 до 100.");
+                return true; // Продовжити гру знову
             }
-            
-            function addToHistory(guess, feedback) {
-                const item = document.createElement('div');
-                item.className = 'history-item';
-                item.textContent = Спроба ${attempts}: ${guess} - ${feedback};
-                historyDiv.appendChild(item);
-            }
-            
-            function endGame() {
-                const playAgain = confirm('Хочете зіграти ще раз?');
+
+            attempts++;
+            const isCorrect = guess === secretNumber;
+            logAttempt(guess, isCorrect);
+
+            if (isCorrect) {
+                alert(`Вітаємо! Ви вгадали число ${secretNumber} за ${attempts} спроб.`);
+                const playAgain = confirm("Хочете зіграти ще раз?");
                 if (playAgain) {
                     startGame();
-                } else {
-                    gameArea.style.display = 'none';
-                    startBtn.style.display = 'inline-block';
-                    showMessage('', '');
                 }
+                return false; // Гра завершена
+            } else {
+                const clue = getClue(guess);
+                alert(`Невірно! Підказка: ${clue}.`);
+                return true; // Продовжити гру
             }
-        });
+        }
+
+        function startGame() {
+            secretNumber = Math.floor(Math.random() * 101); // Генеруємо випадкове число від 0 до 100
+            attempts = 0;
+            consoleOutput.textContent = ""; // Очищаємо історію спроб
+            alert("Нова гра розпочалася! Спробуйте вгадати число від 0 до 100.");
+            let isPlaying = true;
+            while (isPlaying) {
+                isPlaying = playGame();
+            }
+        }
     </script>
 </body>
 </html>
