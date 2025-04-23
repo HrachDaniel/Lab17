@@ -3,32 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Поточний час</title>
+    <title>Поточна дата та час</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .datetime-container {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 1.2em;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            display: block;
+            margin: 0 auto;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+    </style>
 </head>
 <body>
-    <h1>Поточний час:</h1>
-    <div id="current-time"></div>
-
+    <h1>Поточна дата та час</h1>
+    
+    <div class="datetime-container">
+        <p id="datetime-output"></p>
+    </div>
+    
+    <button onclick="updateDateTime()">Оновити дату та час</button>
+    
     <script>
-        function показатиПоточнийЧас() {
-            const зараз = new Date();
-            const години = зараз.getHours().toString().padStart(2, '0');
-            const хвилини = зараз.getMinutes().toString().padStart(2, '0');
-            const секунди = зараз.getSeconds().toString().padStart(2, '0');
-            const деньТижня = new Intl.DateTimeFormat('uk-UA', { weekday: 'long' }).format(зараз);
-            const день = зараз.getDate().toString().padStart(2, '0');
-            const місяць = new Intl.DateTimeFormat('uk-UA', { month: 'long' }).format(зараз);
-            const рік = зараз.getFullYear();
-
-            const відформатованийЧас = ${години}:${хвилини}:${секунди}, ${деньТижня}, ${день} ${місяць} ${рік} року;
-            document.getElementById('current-time').textContent = відформатованийЧас;
+        function getCurrentDateTimeFormatted() {
+            const now = new Date();
+            
+            // Отримуємо компоненти дати
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            // Дні тижня та місяці українською
+            const daysOfWeek = ['неділя', 'понеділок', 'вівторок', 'середа', 'четвер', 'п\'ятниця', 'субота'];
+            const months = [
+                'січня', 'лютого', 'березня', 'квітня', 'травня', 'червня',
+                'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня'
+            ];
+            
+            const dayOfWeek = daysOfWeek[now.getDay()];
+            const day = now.getDate();
+            const month = months[now.getMonth()];
+            const year = now.getFullYear();
+            
+            // Формуємо рядок
+            return ${hours}:${minutes}:${seconds}, ${dayOfWeek}, ${day} ${month} ${year} року;
         }
-
-        // Оновлювати час кожну секунду
-        setInterval(показатиПоточнийЧас, 1000);
-
-        // Показати час одразу після завантаження сторінки
-        показатиПоточнийЧас();
+        
+        function updateDateTime() {
+            const outputElement = document.getElementById('datetime-output');
+            outputElement.textContent = getCurrentDateTimeFormatted();
+            
+            // Виводимо також у консоль
+            console.log(getCurrentDateTimeFormatted());
+        }
+        
+        // Виводимо дату при завантаженні сторінки
+        window.onload = updateDateTime;
     </script>
 </body>
-</html
+</html>
