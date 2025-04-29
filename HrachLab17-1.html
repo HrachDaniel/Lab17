@@ -1,90 +1,86 @@
-<!DOCTYPE html>
+<html>
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Поточна дата та час</title>
+    <title>Поточний час</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            line-height: 1.6;
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
         }
-        h1 {
-            color: #2c3e50;
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             text-align: center;
         }
-        .datetime-container {
-            background-color: #f8f9fa;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: center;
-            font-size: 1.2em;
+        #current-time {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
         }
         button {
-            background-color: #3498db;
-            color: white;
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #007bff;
+            color: #fff;
             border: none;
-            padding: 10px 15px;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 1em;
-            display: block;
-            margin: 0 auto;
+            transition: background-color 0.3s ease;
         }
         button:hover {
-            background-color: #2980b9;
+            background-color: #0056b3;
+        }
+        #console-output {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #eee;
+            font-family: monospace;
+            white-space: pre-wrap;
+            text-align: left;
         }
     </style>
 </head>
 <body>
-    <h1>Поточна дата та час</h1>
-    
-    <div class="datetime-container">
-        <p id="datetime-output"></p>
+    <div class="container">
+        <div id="current-time">Натисніть кнопку, щоб дізнатися поточний час</div>
+        <button onclick="displayCurrentTime()">Показати поточний час</button>
+        <div id="console-output"></div>
     </div>
-    
-    <button onclick="updateDateTime()">Оновити дату та час</button>
-    
+
     <script>
-        function getCurrentDateTimeFormatted() {
+        function getCurrentTimeFormatted() {
             const now = new Date();
-            
-            // Отримуємо компоненти дати
+
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const seconds = String(now.getSeconds()).padStart(2, '0');
-            
-            // Дні тижня та місяці українською
-            const daysOfWeek = ['неділя', 'понеділок', 'вівторок', 'середа', 'четвер', 'п\'ятниця', 'субота'];
-            const months = [
-                'січня', 'лютого', 'березня', 'квітня', 'травня', 'червня',
-                'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня'
-            ];
-            
-            const dayOfWeek = daysOfWeek[now.getDay()];
-            const day = now.getDate();
-            const month = months[now.getMonth()];
+
+            const dayOfWeek = new Intl.DateTimeFormat('uk-UA', { weekday: 'long' }).format(now);
+            const dayOfMonth = String(now.getDate()).padStart(2, '0');
+            const month = new Intl.DateTimeFormat('uk-UA', { month: 'long' }).format(now);
             const year = now.getFullYear();
-            
-            // Формуємо рядок
-            return ${hours}:${minutes}:${seconds}, ${dayOfWeek}, ${day} ${month} ${year} року;
+
+            const formattedTime = `${hours}:${minutes}:${seconds}, ${dayOfWeek}, ${dayOfMonth} ${month} ${year} року`;
+            console.log(formattedTime);
+            return formattedTime;
         }
-        
-        function updateDateTime() {
-            const outputElement = document.getElementById('datetime-output');
-            outputElement.textContent = getCurrentDateTimeFormatted();
-            
-            // Виводимо також у консоль
-            console.log(getCurrentDateTimeFormatted());
+
+        function displayCurrentTime() {
+            const currentTime = getCurrentTimeFormatted();
+            document.getElementById('current-time').textContent = currentTime;
+            document.getElementById('console-output').textContent += `> ${currentTime}\n`;
         }
-        
-        // Виводимо дату при завантаженні сторінки
-        window.onload = updateDateTime;
     </script>
 </body>
 </html>
